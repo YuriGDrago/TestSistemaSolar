@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import gsap from 'gsap'
+import {Pane} from 'tweakpane';
+const pane = new Pane();
 
 /**
  * Base
@@ -24,6 +26,100 @@ const mesh = new THREE.Mesh(
     material
 )
 scene.add(mesh)
+const folderMesh = pane.addFolder({
+    title: 'Mesh'
+})
+const folderPositionMesh = folderMesh.addFolder({
+    title: 'position',
+    expand: true,
+})
+
+
+folderPositionMesh.addInput(mesh.position, "x", {
+    label: "x",
+    min: -20,
+    max: 20,
+    step: 0.1
+})
+
+folderPositionMesh.addInput(mesh.position, "y", {
+    label: "y",
+    min: -20,
+    max: 20,
+    step: 0.1
+})
+
+folderPositionMesh.addInput(mesh.position, "z", {
+    label: "z",
+    min: -180,
+    max: 180,
+    step: 0.1
+})
+
+
+
+const folderRotationMesh = folderMesh.addFolder({
+    title: 'rotation',
+    expand: true,
+})
+
+
+const meshRotationX = folderRotationMesh.addInput(mesh.rotation, "x", {
+    label: "x",
+    min: -180,
+    max: 180,
+    step: 1
+})
+
+meshRotationX.on("change", function(ev) {
+    mesh.rotation.x = ev.value * Math.PI/180
+})
+const meshRotationY = folderRotationMesh.addInput(mesh.rotation, "y", {
+    label: "y",
+    min: -180,
+    max: 180,
+    step: 1
+})
+
+meshRotationY.on("change", function(ev) {
+    mesh.rotation.y = ev.value * Math.PI/180
+})
+const meshRotationZ = folderRotationMesh.addInput(mesh.rotation, "z", {
+    label: "z",
+    min: -180,
+    max: 180,
+    step: 1
+})
+
+meshRotationY.on("change", function(ev) {
+    mesh.rotation.z = ev.value * Math.PI/180
+})
+
+// const meshRotationY = folderRotationMesh.addInput(mesh.rotation, "y", {
+//     label: "y",
+//     min: -180,
+//     max: 180,
+//     step: 1
+// })
+
+// meshRotationY.on("change", function(ev) {
+//     mesh.rotation.y = ev.value * Math.PI/180
+// })
+
+
+
+// meshRotationX.on("change", function(ev) {
+//     mesh.rotation.z = ev.value * Math.PI/180
+// })
+// const meshRotZ = folderRotationMesh.addInput(mesh.rotetion, "z", {
+//     label: "z",
+//     min: -180,
+//     max: 180,
+//     step: 0.1
+// })
+
+folderMesh.addInput(mesh.material, "wireframe")
+folderMesh.addInput(mesh, "visible")
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height,0.1,100)
