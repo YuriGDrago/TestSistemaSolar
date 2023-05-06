@@ -30,7 +30,7 @@ const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height,0.1,10
 // camera.position.z = 2
 // const aspectRatio = sizes.width / sizes.height
 // const camera = new THREE.OrthographicCamera(- 1*aspectRatio, 1*aspectRatio, 1, - 1, 2, 100)
-camera.position.z = 2
+camera.position.z = 5
 camera.lookAt(mesh.position)
 scene.add(camera)
 
@@ -49,7 +49,7 @@ let darkMode = true
 
 window.addEventListener('keypress',(event)=>{
     if(event.code == 'KeyR'){
-        camera.position.set(0,0,2)
+        camera.position.set(0,0,5)
         controls.target.set(0,0,0)
     }
 
