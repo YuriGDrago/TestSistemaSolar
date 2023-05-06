@@ -89,15 +89,8 @@ window.addEventListener('dblclick', () =>
 
 
 
-// Animate
-const clock = new THREE.Clock()
-
 const tick = () =>
 {
-    const elapsedTime = clock.getElapsedTime()
-
-    // Update objects
-    mesh.rotation.y = elapsedTime;
     controls.update()
 
     // Render
