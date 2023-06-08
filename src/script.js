@@ -1,144 +1,150 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.module.js';
 
-// Criar a cena
-const scene = new THREE.Scene();
+let scene, camera, renderer;
+let controls;
+const objects = [];
 
-// Criar a câmera
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
-
-// Criar o renderizador
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// Adicionar controles do mouse para manipulação da câmera
-const controls = new OrbitControls(camera, renderer.domElement);
-
-// Adicionar redimensionamento da tela e suporte a tela cheia
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'f') {
-    toggleFullScreen();
-  }
-});
-
-function toggleFullScreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
-}
-
-// Adicionar iluminação ambiente
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-ambientLight.intensity = 5.5;
-scene.add(ambientLight);
-
-// Adicionar luzes pontuais
-const light1 = new THREE.PointLight(0xff0000, 1, 10);
-light1.position.set(0, 0, 0);
-scene.add(light1);
-
-const light2 = new THREE.PointLight(0x00ff00, 1, 10);
-light2.position.set(0, 0, 0);
-scene.add(light2);
-
-const light3 = new THREE.PointLight(0x0000ff, 1, 10);
-light3.position.set(0, 0, 0);
-light1.intensity = 4.0;
-light2.intensity = 3.5;
-light3.intensity = 4.8;
-scene.add(light1);
-scene.add(light2);
-scene.add(light3);
-
-// Configurar o plano de fundo como uma cor sólida
-scene.background = new THREE.Color(0x0000ff);
-
-// Carregar texturas
-const textureLoader = new THREE.TextureLoader();
-const texture1 = textureLoader.load('textures/texture1.jpg');
-const texture2 = textureLoader.load('textures/texture2.jpg');
-const texture3 = textureLoader.load('textures/texture3.jpg');
-
-// Criar geometrias
-const geometry1 = new THREE.BoxGeometry();
-const geometry2 = new THREE.SphereGeometry();
-const geometry3 = new THREE.ConeGeometry();
-
-// Criar materiais com as texturas
-const material1 = new THREE.MeshPhongMaterial({ map: texture1 });
-const material2 = new THREE.MeshPhongMaterial({ map: texture2 });
-const material3 = new THREE.MeshPhongMaterial({ map: texture3 });
-
-// Criar objetos com as geometrias e materiais
-const object1 = new THREE.Mesh(geometry1, material1);
-scene.add(object1);
-
-const object2 = new THREE.Mesh(geometry2, material2);
-scene.add(object2);
-
-const object3 = new THREE.Mesh(geometry3, material3);
-scene.add(object3);
-
-const object4 = new THREE.Mesh(geometry1, material1);
-scene.add(object4);
-
-const object5 = new THREE.Mesh(geometry2, material2);
-scene.add(object5);
-
-const object6 = new THREE.Mesh(geometry3, material3);
-scene.add(object6);
-
-const object7 = new THREE.Mesh(geometry1, material1);
-scene.add(object7);
-
-const object8 = new THREE.Mesh(geometry2, material2);
-scene.add(object8);
-
-const object9 = new THREE.Mesh(geometry3, material3);
-scene.add(object9);
-
-const object10 = new THREE.Mesh(geometry1, material1);
-scene.add(object10);
-
-const objects = [object1, object2, object3, object4, object5, object6, object7, object8, object9, object10];
-
-// Definir o raio da órbita
-const orbitRadius = 4;
-
-// Configurar animação
-function animate() {
-  requestAnimationFrame(animate);
-
-  // Atualizar a posição dos objetos
-  const time = Date.now() * 0.001; // Tempo em segundos
-  const orbitSpeed = 0.5; // Velocidade da órbita
-  const angleIncrement = (Math.PI * 2) / objects.length; // Incremento do ângulo para cada objeto
-
-  for (let i = 0; i < objects.length; i++) {
-    const object = objects[i];
-    const angle = time * orbitSpeed + i * angleIncrement; // Ângulo atual da órbita
-
-    // Calcular a posição do objeto na órbita circular
-    const x = Math.cos(angle) * orbitRadius;
-    const z = Math.sin(angle) * orbitRadius;
-
-    object.position.set(x, 0, z);
-    object.rotation.y += 0.01; // Rotação do objeto em torno de seu próprio eixo
-  }
-
-  renderer.render(scene, camera);
-}
-
+init();
 animate();
+
+function init() {
+  // Cria a cena
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000); // Define a cor de fundo da cena
+
+  // Cria a câmera
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.z = 30;
+
+  // Cria o renderizador
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Cria os controles de órbita
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  // Habilita o modo de tela cheia
+  const fullScreenButton = document.createElement('button');
+  fullScreenButton.innerHTML = 'Tela Cheia';
+  fullScreenButton.addEventListener('click', () => {
+    if (document.body.requestFullscreen) {
+      document.body.requestFullscreen();
+    } else if (document.body.mozRequestFullScreen) {
+      document.body.mozRequestFullScreen();
+    } else if (document.body.webkitRequestFullscreen) {
+      document.body.webkitRequestFullscreen();
+    } else if (document.body.msRequestFullscreen) {
+      document.body.msRequestFullscreen();
+    }
+  });
+  document.body.appendChild(fullScreenButton);
+
+  // Cria o sol
+  const sunGeometry = new THREE.SphereGeometry(5, 32, 32);
+  const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+  const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+  scene.add(sun);
+  objects.push(sun);
+
+  // Cria uma luz pontual (Sol)
+  const sunLight = new THREE.PointLight(0xffffff, 1);
+  sunLight.position.set(0, 0, 0);
+  scene.add(sunLight);
+
+  // Cria os planetas
+  const planetGeometry = new THREE.SphereGeometry(2, 32, 32);
+
+  // Importando as texturas existentes na biblioteca Three.js
+  const textureLoader = new THREE.TextureLoader();
+  const mercuryTexture = textureLoader.load('textures/planets/mercury.jpg');
+  const venusTexture = textureLoader.load('textures/planets/venus.jpg');
+  const earthTexture = textureLoader.load('textures/planets/earth.jpg');
+  const marsTexture = textureLoader.load('textures/planets/mars.jpg');
+  const jupiterTexture = textureLoader.load('textures/planets/jupiter.jpg');
+  const saturnTexture = textureLoader.load('textures/planets/saturn.jpg');
+  const uranusTexture = textureLoader.load('textures/planets/uranus.jpg');
+  const neptuneTexture = textureLoader.load('textures/planets/neptune.jpg');
+
+  // ...
+
+  // Criando os materiais com as texturas
+  const mercuryMaterial = new THREE.MeshBasicMaterial({ map: mercuryTexture });
+  const venusMaterial = new THREE.MeshBasicMaterial({ map: venusTexture });
+  const earthMaterial = new THREE.MeshBasicMaterial({ map: earthTexture });
+  const marsMaterial = new THREE.MeshBasicMaterial({ map: marsTexture });
+  const jupiterMaterial = new THREE.MeshBasicMaterial({ map: jupiterTexture });
+  const saturnMaterial = new THREE.MeshBasicMaterial({ map: saturnTexture });
+  const uranusMaterial = new THREE.MeshBasicMaterial({ map: uranusTexture });
+  const neptuneMaterial = new THREE.MeshBasicMaterial({ map: neptuneTexture });
+
+  // ...
+
+  // Criando as malhas dos planetas com os materiais
+  const mercury = new THREE.Mesh(planetGeometry, mercuryMaterial);
+  mercury.position.x = 12;
+  scene.add(mercury);
+  objects.push(mercury);
+
+  const venus = new THREE.Mesh(planetGeometry, venusMaterial);
+  venus.position.x = 16;
+  scene.add(venus);
+  objects.push(venus);
+
+  const earth = new THREE.Mesh(planetGeometry, earthMaterial);
+  earth.position.x = 20;
+  scene.add(earth);
+  objects.push(earth);
+
+  const mars = new THREE.Mesh(planetGeometry, marsMaterial);
+  mars.position.x = 24;
+  scene.add(mars);
+  objects.push(mars);
+
+  const jupiter = new THREE.Mesh(planetGeometry, jupiterMaterial);
+  jupiter.position.x = 30;
+  scene.add(jupiter);
+  objects.push(jupiter);
+
+  const saturn = new THREE.Mesh(planetGeometry, saturnMaterial);
+  saturn.position.x = 36;
+  scene.add(saturn);
+  objects.push(saturn);
+
+  const uranus = new THREE.Mesh(planetGeometry, uranusMaterial);
+  uranus.position.x = 42;
+  scene.add(uranus);
+  objects.push(uranus);
+
+  const neptune = new THREE.Mesh(planetGeometry, neptuneMaterial);
+  neptune.position.x = 48;
+  scene.add(neptune);
+  objects.push(neptune);
+
+  // ...
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // Faz os planetas orbitarem
+    objects.forEach(function (planet) {
+      planet.position.x -= 0.05;
+      if (planet.position.x < -50) {
+        planet.position.x = 50;
+      }
+    });
+
+    // Atualiza os controles
+    controls.update();
+
+    // Renderiza a cena
+    renderer.render(scene, camera);
+  }
+}
+
+init();
