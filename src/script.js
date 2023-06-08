@@ -1,201 +1,144 @@
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import gsap from 'gsap'
-import {Pane} from 'tweakpane';
-const pane = new Pane();
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-/**
- * Base
- */
-// Canvas
-const canvas = document.querySelector('canvas.webgl')
+// Criar a cena
+const scene = new THREE.Scene();
 
-// Sizes
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
+// Criar a câmera
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+// Criar o renderizador
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Adicionar controles do mouse para manipulação da câmera
+const controls = new OrbitControls(camera, renderer.domElement);
+
+// Adicionar redimensionamento da tela e suporte a tela cheia
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'f') {
+    toggleFullScreen();
+  }
+});
+
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
 }
 
-// Scene
-const scene = new THREE.Scene()
+// Adicionar iluminação ambiente
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+ambientLight.intensity = 5.5;
+scene.add(ambientLight);
 
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000})
-// Object
-const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1, 2, 2, 2),
-    material
-)
-scene.add(mesh)
-const folderMesh = pane.addFolder({
-    title: 'Mesh'
-})
-const folderPositionMesh = folderMesh.addFolder({
-    title: 'position',
-    expand: true,
-})
+// Adicionar luzes pontuais
+const light1 = new THREE.PointLight(0xff0000, 1, 10);
+light1.position.set(0, 0, 0);
+scene.add(light1);
 
+const light2 = new THREE.PointLight(0x00ff00, 1, 10);
+light2.position.set(0, 0, 0);
+scene.add(light2);
 
-folderPositionMesh.addInput(mesh.position, "x", {
-    label: "x",
-    min: -20,
-    max: 20,
-    step: 0.1
-})
+const light3 = new THREE.PointLight(0x0000ff, 1, 10);
+light3.position.set(0, 0, 0);
+light1.intensity = 4.0;
+light2.intensity = 3.5;
+light3.intensity = 4.8;
+scene.add(light1);
+scene.add(light2);
+scene.add(light3);
 
-folderPositionMesh.addInput(mesh.position, "y", {
-    label: "y",
-    min: -20,
-    max: 20,
-    step: 0.1
-})
+// Configurar o plano de fundo como uma cor sólida
+scene.background = new THREE.Color(0x0000ff);
 
-folderPositionMesh.addInput(mesh.position, "z", {
-    label: "z",
-    min: -180,
-    max: 180,
-    step: 0.1
-})
+// Carregar texturas
+const textureLoader = new THREE.TextureLoader();
+const texture1 = textureLoader.load('textures/texture1.jpg');
+const texture2 = textureLoader.load('textures/texture2.jpg');
+const texture3 = textureLoader.load('textures/texture3.jpg');
 
+// Criar geometrias
+const geometry1 = new THREE.BoxGeometry();
+const geometry2 = new THREE.SphereGeometry();
+const geometry3 = new THREE.ConeGeometry();
 
+// Criar materiais com as texturas
+const material1 = new THREE.MeshPhongMaterial({ map: texture1 });
+const material2 = new THREE.MeshPhongMaterial({ map: texture2 });
+const material3 = new THREE.MeshPhongMaterial({ map: texture3 });
 
-const folderRotationMesh = folderMesh.addFolder({
-    title: 'rotation',
-    expand: true,
-})
+// Criar objetos com as geometrias e materiais
+const object1 = new THREE.Mesh(geometry1, material1);
+scene.add(object1);
 
+const object2 = new THREE.Mesh(geometry2, material2);
+scene.add(object2);
 
-const meshRotationX = folderRotationMesh.addInput(mesh.rotation, "x", {
-    label: "x",
-    min: -180,
-    max: 180,
-    step: 1
-})
+const object3 = new THREE.Mesh(geometry3, material3);
+scene.add(object3);
 
-meshRotationX.on("change", function(ev) {
-    mesh.rotation.x = ev.value * Math.PI/180
-})
-const meshRotationY = folderRotationMesh.addInput(mesh.rotation, "y", {
-    label: "y",
-    min: -180,
-    max: 180,
-    step: 1
-})
+const object4 = new THREE.Mesh(geometry1, material1);
+scene.add(object4);
 
-meshRotationY.on("change", function(ev) {
-    mesh.rotation.y = ev.value * Math.PI/180
-})
-const meshRotationZ = folderRotationMesh.addInput(mesh.rotation, "z", {
-    label: "z",
-    min: -180,
-    max: 180,
-    step: 1
-})
+const object5 = new THREE.Mesh(geometry2, material2);
+scene.add(object5);
 
-meshRotationY.on("change", function(ev) {
-    mesh.rotation.z = ev.value * Math.PI/180
-})
+const object6 = new THREE.Mesh(geometry3, material3);
+scene.add(object6);
 
-// const meshRotationY = folderRotationMesh.addInput(mesh.rotation, "y", {
-//     label: "y",
-//     min: -180,
-//     max: 180,
-//     step: 1
-// })
+const object7 = new THREE.Mesh(geometry1, material1);
+scene.add(object7);
 
-// meshRotationY.on("change", function(ev) {
-//     mesh.rotation.y = ev.value * Math.PI/180
-// })
+const object8 = new THREE.Mesh(geometry2, material2);
+scene.add(object8);
 
+const object9 = new THREE.Mesh(geometry3, material3);
+scene.add(object9);
 
+const object10 = new THREE.Mesh(geometry1, material1);
+scene.add(object10);
 
-// meshRotationX.on("change", function(ev) {
-//     mesh.rotation.z = ev.value * Math.PI/180
-// })
-// const meshRotZ = folderRotationMesh.addInput(mesh.rotetion, "z", {
-//     label: "z",
-//     min: -180,
-//     max: 180,
-//     step: 0.1
-// })
+const objects = [object1, object2, object3, object4, object5, object6, object7, object8, object9, object10];
 
-folderMesh.addInput(mesh.material, "wireframe")
-folderMesh.addInput(mesh, "visible")
+// Definir o raio da órbita
+const orbitRadius = 4;
 
-// Camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height,0.1,100)
-// camera.position.x = 2
-// camera.position.y = 2
-// camera.position.z = 2
-// const aspectRatio = sizes.width / sizes.height
-// const camera = new THREE.OrthographicCamera(- 1*aspectRatio, 1*aspectRatio, 1, - 1, 2, 100)
-camera.position.z = 5
-camera.lookAt(mesh.position)
-scene.add(camera)
+// Configurar animação
+function animate() {
+  requestAnimationFrame(animate);
 
-// Renderer
-const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
-})
-renderer.setSize(sizes.width, sizes.height)
+  // Atualizar a posição dos objetos
+  const time = Date.now() * 0.001; // Tempo em segundos
+  const orbitSpeed = 0.5; // Velocidade da órbita
+  const angleIncrement = (Math.PI * 2) / objects.length; // Incremento do ângulo para cada objeto
 
-// Controls
-const controls = new OrbitControls(camera, canvas)
+  for (let i = 0; i < objects.length; i++) {
+    const object = objects[i];
+    const angle = time * orbitSpeed + i * angleIncrement; // Ângulo atual da órbita
 
-controls.enableDamping = true
+    // Calcular a posição do objeto na órbita circular
+    const x = Math.cos(angle) * orbitRadius;
+    const z = Math.sin(angle) * orbitRadius;
 
-let darkMode = true
+    object.position.set(x, 0, z);
+    object.rotation.y += 0.01; // Rotação do objeto em torno de seu próprio eixo
+  }
 
-window.addEventListener('keypress',(event)=>{
-    if(event.code == 'KeyR'){
-        camera.position.set(0,0,5)
-        controls.target.set(0,0,0)
-    }
-
-    if (event.code == 'KeyO'){
-        (darkMode) ? 
-            renderer.setClearColor( 0xffffff, 1): 
-            renderer.setClearColor( 0x000000, 1)
-        darkMode = !darkMode
-    }
-})
-
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-		// Update camera
-    camera.aspect = sizes.width / sizes.height
-		camera.updateProjectionMatrix()
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
-
-window.addEventListener('dblclick', () =>
-{
-    if(!document.fullscreenElement)
-    {
-        canvas.requestFullscreen()
-    }
-    else
-    {
-        document.exitFullscreen()
-    }
-})
-
-
-
-
-const tick = () =>
-{
-    controls.update()
-
-    // Render
-    renderer.render(scene, camera)
-
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+  renderer.render(scene, camera);
 }
 
-tick()
+animate();
